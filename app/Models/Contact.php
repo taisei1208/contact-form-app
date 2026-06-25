@@ -33,7 +33,8 @@ class Contact extends Model
         return $this->belongsToMany(Tag::class);
     }
 
-    public function getGenderLabelAttribute(): string{
+    public function getGenderLabelAttribute(): string
+    {
         return match ($this->gender) {
             1 => '男性',
             2 => '女性',
