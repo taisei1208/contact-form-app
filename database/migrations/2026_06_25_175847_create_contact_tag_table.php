@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('tag_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
 
-            //複合ユニーク制約の設定
+            // 複合ユニーク制約の設定
             $table->unique(['contact_id', 'tag_id']);
         });
     }
