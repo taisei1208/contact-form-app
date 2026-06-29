@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -40,5 +41,31 @@ class Contact extends Model
             2 => '女性',
             default => 'その他',
         };
+    }
+
+    public function scopeSearch(Builder $query, array $filters): Builder
+    {
+        if (! empty($filters['keyword'])) {
+            $keyword = $filters['keyword'];
+
+            $query->where(function ($query) use ($keyword) {
+                $query->where('last_name', 'like', "%{$keyword}%")
+                    ->orWhere('first_name', 'like', "%{$keyword}%")->orWhere('email', 'like', "%{$keyword}%");
+            });
+        }
+
+        if (! empty($filters['gender'])) {
+            $query->where('gender', $filters['gender']);
+        }
+
+        if (! empty($filters['category_id'])) {
+            $query->where('category_id', $filters['category_id']);
+        }
+
+        if (! empty($filters['date'])) {
+            $query->whereDate('created_at', $filters['date']);
+        }
+
+        return $query;
     }
 }

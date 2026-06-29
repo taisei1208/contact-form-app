@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,20 +15,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
-//お問合せフォーム
+// お問合せフォーム
 Route::get('/', [ContactController::class, 'index']);
 Route::post('/contacts/confirm', [ContactController::class, 'confirm']);
 Route::post('/contacts', [ContactController::class, 'store']);
 Route::get('/thanks', [ContactController::class, 'thanks'])->name('contacts.thanks');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/admin', function () {
-        return '
-            <form action="/logout" method="POST">
-                ' . csrf_field() . '
-                <button type="submit">logout</button>
-            </form>
-        ';
-    });
+    Route::resource('/admin', AdminController::class)->only(['index', 'show']);
 });
