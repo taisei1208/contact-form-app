@@ -22,5 +22,9 @@ Route::post('/contacts', [ContactController::class, 'store']);
 Route::get('/thanks', [ContactController::class, 'thanks'])->name('contacts.thanks');
 
 Route::middleware('auth')->group(function () {
-    Route::resource('/admin', AdminController::class)->only(['index', 'show']);
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+
+    Route::get('/admin/contacts/{contact}', [AdminController::class, 'show']);
+
+    Route::delete('/admin/contacts/{contact}', [AdminController::class, 'destroy']);
 });
