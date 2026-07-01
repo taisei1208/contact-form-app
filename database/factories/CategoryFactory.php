@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Tag;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Tag>
+ * @extends Factory<Category>
  */
-class TagFactory extends Factory
+class CategoryFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,7 +18,7 @@ class TagFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->text(50),
+            'content' => fake()->text(255),
         ];
     }
 }
