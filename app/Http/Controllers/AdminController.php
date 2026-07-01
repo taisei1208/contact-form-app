@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\IndexContactRequest;
 use App\Models\Category;
 use App\Models\Contact;
 use App\Models\Tag;
-use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    public function index(Request $request)
+    public function index(IndexContactRequest $request)
     {
         $categories = Category::all();
 
+        $validated = $request->validated();
+
         $contactsFilters = $request->only([
-            'keyword',
-            'gender',
-            'category_id',
-            'date',
+            'keyword' => $validated['keyword'] ?? null,
+            'gender' => $validated['gender'] ?? null,
+            'category_id' => $validated['category_id'] ?? null,
+            'date' => $validated['date'] ?? null,
         ]);
 
         $contacts = Contact::with(['category', 'tags'])
