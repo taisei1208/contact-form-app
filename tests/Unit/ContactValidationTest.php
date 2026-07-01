@@ -98,6 +98,43 @@ class ContactValidationTest extends TestCase
         $this->assertArrayHasKey('tel', $validator->errors()->toArray());
     }
 
+    /** @test */
+    public function csvエクスポートで正しいフィルタ条件を受け付ける(): void
+    {
+        $category = Category::factory()->create();
+
+        $validator = $this->makeValidator(new IndexContactRequest, [
+            'keyword' => '山田',
+            'gender' => '1',
+            'category_id' => $category->id,
+            'date' => '2026-06-27',
+        ]);
+
+        $this->assertTrue($validator->passes());
+    }
+
+    /** @test */
+    public function csvエクスポートで不正な性別は拒否される(): void
+    {
+        $validator = $this->makeValidator(new IndexContactRequest, [
+            'gender' => '9',
+        ]);
+
+        $this->assertFalse($validator->passes());
+        $this->assertArrayHasKey('gender', $validator->errors()->toArray());
+    }
+
+    /** @test */
+    public function csvエクスポートで存在しないカテゴリidは拒否される(): void
+    {
+        $validator = $this->makeValidator(new IndexContactRequest, [
+            'category_id' => 9999,
+        ]);
+
+        $this->assertFalse($validator->passes());
+        $this->assertArrayHasKey('category_id', $validator->errors()->toArray());
+    }
+
     private function makeValidator($request, array $data)
     {
         return validator(

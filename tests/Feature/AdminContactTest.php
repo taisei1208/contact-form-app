@@ -115,4 +115,63 @@ class AdminContactTest extends TestCase
             'id' => $contact->id,
         ]);
     }
+
+    /** @test */
+    public function ログイン済み管理者はフィルタ条件付きでcsvをダウンロードできる(): void
+    {
+        $user = User::factory()->create();
+        Category::factory()->create();
+
+        Contact::factory()->create([
+            'email' => 'target@example.com',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('contacts.export'));
+
+        $response->assertStatus(200);
+
+        $csv = $response->streamedContent();
+
+        $this->assertStringContainsString('target@example.com', $csv);
+    }
+
+    /** @test */
+    public function csvエクスポートで条件無指定時は新着順で出力される(): void
+    {
+        $user = User::factory()->create();
+
+        Category::factory()->create();
+
+        Contact::factory()->create([
+            'email' => 'old@example.com',
+            'created_at' => '2026-06-25 10:00:00',
+        ]);
+
+        Contact::factory()->create([
+            'email' => 'middle@example.com',
+            'created_at' => '2026-06-26 10:00:00',
+        ]);
+
+        Contact::factory()->create([
+            'email' => 'new@example.com',
+            'created_at' => '2026-06-27 10:00:00',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('contacts.export'));
+
+        $response->assertStatus(200);
+
+        $csv = $response->streamedContent();
+
+        $this->assertStringContainsString('new@example.com', $csv);
+        $this->assertStringContainsString('middle@example.com', $csv);
+        $this->assertStringContainsString('old@example.com', $csv);
+
+        $newPosition = strpos($csv, 'new@example.com');
+        $middlePosition = strpos($csv, 'middle@example.com');
+        $oldPosition = strpos($csv, 'old@example.com');
+
+        $this->assertLessThan($middlePosition, $newPosition);
+        $this->assertLessThan($oldPosition, $middlePosition);
+    }
 }
